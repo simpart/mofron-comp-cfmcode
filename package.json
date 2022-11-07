@@ -1,0 +1,24 @@
+{
+  "name": "mofron-comp-cfmcode",
+  "version": "0.0.1",
+  "description": "ConfirmCode component for mofron",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mofron-comp-input" : "",
+    "mofron-layout-margin": "",
+    "mofron-event-key" : ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simpart/mofron-comp-cfmcode.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simpart/mofron-comp-cfmcode/issues"
+  },
+  "homepage": "https://github.com/simpart/mofron-comp-cfmcode#readme"
+}
