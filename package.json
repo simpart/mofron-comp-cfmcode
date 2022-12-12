@@ -1,15 +1,19 @@
 {
   "name": "mofron-comp-cfmcode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ConfirmCode component for mofron",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "mofron-comp-input" : "",
+    "mofron-comp-text": "",
+    "mofron-comp-errmsg": "",
+    "mofron-comp-codeinput": "",
+    "mofron-effect-hrzpos": "",
     "mofron-layout-margin": "",
-    "mofron-event-key" : ""
+    "mofron-layout-hrzcenter": "",
+    "mofron-event-click": ""
   },
   "repository": {
     "type": "git",

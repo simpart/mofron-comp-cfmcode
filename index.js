@@ -3,9 +3,13 @@
  * @brief confirm code component for mofron
  * @license MIT
  */
-const Input     = require('mofron-comp-input');
+const Text      = require('mofron-comp-text');
+const ErrMsg    = require('mofron-comp-errmsg');
+const CodeInput = require('mofron-comp-codeinput');
+const HrzPos    = require('mofron-effect-hrzpos');
 const loMargin  = require('mofron-layout-margin');
-const Key       = require('mofron-event-key');
+const HrzCenter = require('mofron-layout-hrzcenter');
+const Click     = require('mofron-event-click');
 const ConfArg   = mofron.class.ConfArg;
 const comutl    = mofron.util.common;
 
@@ -21,13 +25,10 @@ module.exports = class extends mofron.class.Component {
     constructor (p1) {
         try {
             super();
-            this.modname("CfmCode");
-	    this.shortForm("digits");
+            this.modname("cfmcode");
+	    this.shortForm("text");
             
 	    /* init config */
-            this.confmng().add('digits', { type:'number', init:0 });
-            this.confmng().add('mainColor', { type:'color' });
-	    this.confmng().add('codeEvent', { type:'event', list:true })
             
 	    if (0 < arguments.length) {
                 this.config(p1);
@@ -46,71 +47,68 @@ module.exports = class extends mofron.class.Component {
     initDomConts () {
         try {
             super.initDomConts();
-	    this.style({
-                'display': 'flex'
+	    
+            this.layout([
+	        new loMargin('top','0.3rem'),
+		new HrzCenter(90)
+            ]);
+            this.codeinput().style({ 'margin-top': '0.2rem' });
+	    this.resendText().config({
+                text:'Resend Code', effect:new HrzPos(), size:'0.2rem'
 	    });
-            this.digits(6);
+            
+            this.child([
+                /* error area */
+                new mofron.class.Component({ child:this.errmsg() }),
+                /* text area */
+                new mofron.class.Component({}),
+                this.codeinput(),
+		this.resendText()
+            ]);
 
-	    this.layout([
-                new loMargin('left', '0.2rem')
-	    ]);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 
-    codeEvent (fnc,prm) {
+    errmsg (prm) {
         try {
-            return this.confmng(
-                       'codeEvent',
-                       (undefined === fnc) ? undefined : [fnc,prm]
-                   );
-	} catch (e) {             
-            console.error(e.stack);
-            throw e;          
-        } 
-    }
-    
-    keyEvent (p1,p2,p3) {
-        try {
-	    if ( ('Backspace' === p2) ||
-	         ('Enter' === p2) ||
-		 (0 === p2.indexOf('Arrow')) ) {
-                return;
-	    }
-	    let inp_lst   = p3.getInput();
-	    let focus_idx = 0;
-            let code_lst  = [];
-	    for (let idx in inp_lst) {
-                if (inp_lst[idx].id() === p1.id()) {
-                    focus_idx = parseInt(idx);
-		}
-                code_lst.push(inp_lst[idx].value());
-	    }
-	    if (focus_idx < (inp_lst.length-1)) {
-                inp_lst[focus_idx+1].focus(true);
+            if ('string' === typeof prm) {
+                this.errmsg().text(prm);
 		return;
-	    }
-            let code_evt = p3.codeEvent();
-            for (let cidx in code_evt) {
-                code_evt[cidx][0](p3, code_lst, code_evt[cidx][1]);
             }
+	    return this.innerComp('errmsg', prm, ErrMsg);
 	} catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
-
-    value () {
-        
+    
+    text (prm) {
+        try {
+            if (true === Array.isArray(prm)) {
+                for (let idx in prm) {
+                    this.text(prm[idx]);
+                }
+                return;
+            } else if ('string' === typeof prm) {
+                this.child()[1].child(
+                    new Text({ text:prm, effect:new HrzPos(), size:"0.2rem" })
+		);
+	    } else if (true === comutl.iscmp(prm)) {
+                this.child()[1].child(prm);
+	    }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
     }
 
-    reset () {
+    inputConf (prm) {
         try {
-            let inp = this.getInput();
-            for (let idx in inp) {
-                inp[idx].value("");
+            for (let idx in prm) {
+                this.codeinput()[idx](prm[idx]);
             }
 	} catch (e) {
             console.error(e.stack);
@@ -118,58 +116,55 @@ module.exports = class extends mofron.class.Component {
 	}
     }
 
-    afterRender () {
+    resendText (prm) {
         try {
-            super.afterRender();
-            let inp_cnt = this.digits();
-            for (let inp_idx=0;inp_idx < inp_cnt;inp_idx++) {
-	        let set_inp = new Input({
-                                  width:  '0.4rem', height: '0.6rem',
-                                  style:  { 'text-align':'center' },
-				  event: new Key({
-				             listener: new ConfArg(this.keyEvent,this),
-					     type: 'keyup'
-					 })
-                              });
-                this.child(set_inp);
-                if (null !== this.mainColor()) {
-                    set_inp.accentColor(this.mainColor());
-                }
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-
-    getInput (prm) {
-        try {
-            let chd = this.child();
-            let ret     = [];
-            for (let cidx in chd) {
-                if (true === comutl.isinc(chd[cidx],'Input')){
-                    ret.push(chd[cidx]);
-		}
-            }
-	    return ret;
+            return this.innerComp('resendText', prm, Text);
 	} catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 
+    resendCode (fnc, prm) {
+        try {
+            let evt = new ConfArg(fnc,prm);
+            this.resendText().event(new Click(evt));
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    codeinput (prm) {
+        try {
+            return this.innerComp('codeinput', prm, CodeInput);
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     digits (prm) {
         try {
-            return this.confmng("digits", prm);
+            return this.codeinput().digits(prm);
+	} catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    codeEvent (fnc,prm) {
+        try {
+            return this.codeinput().codeEvent(fnc,prm);
 	} catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 
-    mainColor (prm, opt) {
+    mainColor (prm,opt) {
         try {
-	    return this.confmng("mainColor", prm);
+            return this.codeinput().mainColor(prm,opt);
 	} catch (e) {
             console.error(e.stack);
             throw e;
