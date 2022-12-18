@@ -1,6 +1,6 @@
 {
   "name": "mofron-comp-cfmcode",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ConfirmCode component for mofron",
   "main": "index.js",
   "scripts": {

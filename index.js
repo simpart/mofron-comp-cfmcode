@@ -59,7 +59,7 @@ module.exports = class extends mofron.class.Component {
             
             this.child([
                 /* error area */
-                new mofron.class.Component({ child:this.errmsg() }),
+		this.errmsg(),
                 /* text area */
                 new mofron.class.Component({}),
                 this.codeinput(),
